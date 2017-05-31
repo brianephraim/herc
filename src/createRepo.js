@@ -4,6 +4,13 @@ const fs = require('fs-extra');
 
 const exec = require('child-process-promise').exec;
 
+const inquirer = require('inquirer');
+
+inquirer.prompt(['hey wha is up']).then(function (answers) {
+    // Use user feedback for... whatever!! 
+    console.log('AND THE ANSERS ARE');
+    console.log('answers', answers);
+});
 // const a = fs.readJsonSync('./asdfasdf.json');
 // console.log('AAAAA',a)
 
@@ -16,14 +23,20 @@ function initPackageDotJson(repoName) {
     console.log('stdout', JSON.parse(stdout));
     console.log('stdout', typeof stdout);
   });
+  exec(`curl https://github.com/defualt/${repoName}/`).then(({error, stdout}) => {
+    const repoAvailable = stdout === 'Not Found';
+  });
+  // Promise.all
   try {
     
   } catch (e) {
     console.log('eee',e);
   }
 
+  // throw 'asdf';
+
 }
-initPackageDotJson('bind_herex');
+initPackageDotJson('hercx');
 
 function createRepo(repoName, token) {
   return exec(`curl -H "Authorization: token ${token}" https://api.github.com/user/repos -d '{"name":"${repoName}"}'`)
