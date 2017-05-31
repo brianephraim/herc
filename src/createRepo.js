@@ -6,7 +6,16 @@ const exec = require('child-process-promise').exec;
 
 const inquirer = require('inquirer');
 
-inquirer.prompt(['hey wha is up']).then(function (answers) {
+inquirer.prompt([
+  {
+    type: 'input',
+    name: 'last_name',
+    message: 'What\'s your last name',
+    default: function () {
+      return 'Doe';
+    }
+  }
+]).then(function (answers) {
     // Use user feedback for... whatever!! 
     console.log('AND THE ANSERS ARE');
     console.log('answers', answers);
