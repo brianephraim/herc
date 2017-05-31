@@ -3,6 +3,7 @@
 /* eslint-disable no-lonely-if */
 /* eslint-disable no-plusplus */
 /* eslint-disable no-console */
+/* eslint-disable no-unused-vars */
 
 
 require('pretty-error').start();
@@ -15,24 +16,50 @@ const exec = require('child-process-promise').exec;
 
 function getChangedPackages() {
   return exec(
-    // 'git ls-files -m'
-    'ls ./packages/'
+    'git ls-files -m'
   ).then(({ stdout }) => {
-    // const packagesWithChanges = Object.keys(
-    //   stdout.split('\n').reduce((accum, filePath) => {
-    //     console.log('filePath',filePath);
-    //     if (filePath.indexOf('packages/') === 0) {
-    //       const packageFolderName = filePath.split('/')[1];
-    //       accum[packageFolderName] = true;
-    //     }
-    //     return accum;
-    //   }, {})
-    // );
-    const packagesWithChanges = stdout.split('\n');
+    const packagesWithChanges = Object.keys(
+      stdout.split('\n').reduce((accum, filePath) => {
+        if (filePath.indexOf('packages/') === 0) {
+          const packageFolderName = filePath.split('/')[1];
+          accum[packageFolderName] = true;
+        }
+        return accum;
+      }, {})
+    );
     return packagesWithChanges;
   });
 }
 
+function getPackageFolderNames() {
+  return exec(
+    'ls ./packages/'
+  ).then(({ stdout }) => {
+    const packageFolderNames = stdout.split('\n');
+    return packageFolderNames;
+  });
+}
+
+function filterOutNonRepos(packageFolderNames) {
+  return packageFolderNames.reduce((repos, packageFolderName) => {
+    try {
+      const packageDotJsonContents = fs.readJsonSync(`./packages/${packageFolderName}/package.json`);
+      if (packageDotJsonContents && !packageDotJsonContents.private) {
+        const repoUrl = (
+          packageDotJsonContents.repository && packageDotJsonContents.repository.url
+        ) ? packageDotJsonContents.repository.url : null;
+
+        repos.push({
+          packageFolderName,
+          repoUrl,
+        });
+      }
+    } catch (error) {
+      null;
+    }
+    return repos;
+  }, []);
+}
 function determineReposStatuses(packagesWithChanges) {
   const reposStatuses = packagesWithChanges.reduce((statuses, packageFolderName) => {
     try {
@@ -102,30 +129,16 @@ function createRepo(repoName, token) {
   });
 }
 
-function createRepos(reposStatuses) {
-  const promises = reposStatuses.noRepo.map((info) => {
-    const repoName = info.packageFolderName;
-    return createRepo(repoName, process.env.GITHUB_API_TOKEN);
-  });
-  if (promises.length) {
-    return Promise.all(promises).then((modifiedNoRep) => {
-      const repos = reposStatuses.hasRepo.concat(modifiedNoRep);
-      return repos;
-    });
-  }
-  return reposStatuses.hasRepo;
-}
-
 function mkdirPassthrough(reposNeedingCommits) {
   if (reposNeedingCommits && reposNeedingCommits.length) {
     return exec('rm -rf tempRepos && mkdir tempRepos').then(() => {
       return reposNeedingCommits;
     });
   }
-  // return reposNeedingCommits;
+  return Promise.reject(new Error('No repos'));
 }
 
-function recurseRepos(reposNeedingCommits) {
+function processRepos(reposNeedingCommits) {
   let i = 0;
   const recurse = () => {
     if (i < reposNeedingCommits.length) {
@@ -133,8 +146,9 @@ function recurseRepos(reposNeedingCommits) {
       i++;
 
       const packageFolderName = reposNeedingCommits[j].packageFolderName;
+      console.info(`Processing ${packageFolderName} as a repo`);
 
-      // TRY TO CREATE A NEW REPO ON GITHUB WITH THE NAME VIA packageFolderName 
+      // TRY TO CREATE A NEW REPO ON GITHUB WITH THE NAME VIA packageFolderName
       return createRepo(packageFolderName, process.env.GITHUB_API_TOKEN)
       // IF THAT REPO NAME ALREADY EXISTS ON GITHUB, EVERYTHING IS ACTUALLY FINE
       // PROCEED WITH COMMITTING TO IT
@@ -202,6 +216,7 @@ function recurseRepos(reposNeedingCommits) {
       /*
       */
       .then(() => {
+        console.info(`Done processing ${packageFolderName}.`);
         return recurse();
       });
     }
@@ -211,10 +226,10 @@ function recurseRepos(reposNeedingCommits) {
 }
 
 if (argv.m) {
-  getChangedPackages()
-  .then(determineReposStatuses)
+  getPackageFolderNames()
+  .then(filterOutNonRepos)
   .then(mkdirPassthrough)
-  .then(recurseRepos)
+  .then(processRepos)
   .catch((e) => {
     console.log('CAUGHT!!', e);
   });
