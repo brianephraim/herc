@@ -10,7 +10,7 @@ const exec = require('child-process-promise').exec;
 function initPackageDotJson(repoName) {
   let packageDotJsonContents;
   try {
-    exec(`curl https://github.com/defualt/${repoName}/`).then((error) => {
+    exec(`curl https://github.com/defualt/${repoName}/`).then(({error}) => {
       console.log('error',error)
     })
   } catch (e) {
@@ -20,7 +20,7 @@ function initPackageDotJson(repoName) {
   // throw 'asdf';
 
 }
-initPackageDotJson('herc');
+initPackageDotJson('hercx');
 
 function createRepo(repoName, token) {
   return exec(`curl -H "Authorization: token ${token}" https://api.github.com/user/repos -d '{"name":"${repoName}"}'`)
