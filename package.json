@@ -8,6 +8,11 @@
   "publishConfig": {
     "access": "public"
   },
+  "dependencies": {
+    "child-process-promise": "^2.2.1",
+    "fs-extra": "^3.0.1",
+    "yargs": "^8.0.1"
+  },
   "devDependencies": {
     "@defualt/dev_env": "^0.0.1"
   }
