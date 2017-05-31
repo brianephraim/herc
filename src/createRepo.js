@@ -4,6 +4,24 @@ const fs = require('fs-extra');
 
 const exec = require('child-process-promise').exec;
 
+// const a = fs.readJsonSync('./asdfasdf.json');
+// console.log('AAAAA',a)
+
+function initPackageDotJson(repoName) {
+  let packageDotJsonContents;
+  try {
+    exec(`curl https://github.com/defualt/${repoName}/`).then((error) => {
+      console.log('error',error)
+    })
+  } catch (e) {
+    console.log('eee',e);
+  }
+
+  // throw 'asdf';
+
+}
+initPackageDotJson('herc');
+
 function createRepo(repoName, token) {
   return exec(`curl -H "Authorization: token ${token}" https://api.github.com/user/repos -d '{"name":"${repoName}"}'`)
   .then(({ error, stdout }) => {
