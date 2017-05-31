@@ -10,8 +10,9 @@ const exec = require('child-process-promise').exec;
 function initPackageDotJson(repoName) {
   let packageDotJsonContents;
   try {
-    exec(`curl https://github.com/defualt/${repoName}/`).then(({error}) => {
+    exec(`curl https://github.com/defualt/${repoName}/`).then(({error, stdout}) => {
       console.log('error',error)
+      console.log('stdout',stdout)
     })
   } catch (e) {
     console.log('eee',e);
