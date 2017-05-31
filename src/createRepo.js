@@ -23,7 +23,7 @@ function initPackageDotJson(repoName) {
   }
 
 }
-initPackageDotJson('bind_here');
+initPackageDotJson('bind_herex');
 
 function createRepo(repoName, token) {
   return exec(`curl -H "Authorization: token ${token}" https://api.github.com/user/repos -d '{"name":"${repoName}"}'`)
