@@ -9,19 +9,21 @@ const exec = require('child-process-promise').exec;
 
 function initPackageDotJson(repoName) {
   let packageDotJsonContents;
+  exec(`curl https://registry.npmjs.org/@defualt%2F${repoName}/`).then(({error, stdout}) => {
+    const repoAvailable = JSON.parse(stdout).error === 'Not Found';
+    console.log('error', error);
+    console.log('gggg',repoAvailable);
+    console.log('stdout', JSON.parse(stdout));
+    console.log('stdout', typeof stdout);
+  });
   try {
-    exec(`curl https://github.com/defualt/${repoName}/`).then(({error, stdout}) => {
-      console.log('error',error)
-      console.log('stdout',stdout)
-    })
+    
   } catch (e) {
     console.log('eee',e);
   }
 
-  // throw 'asdf';
-
 }
-initPackageDotJson('hercx');
+initPackageDotJson('bind_here');
 
 function createRepo(repoName, token) {
   return exec(`curl -H "Authorization: token ${token}" https://api.github.com/user/repos -d '{"name":"${repoName}"}'`)
