@@ -4,17 +4,17 @@
     "type": "git",
     "url": "https://github.com/defualt/herc.git"
   },
-  "version": "0.0.3",
+  "version": "0.0.4",
   "publishConfig": {
     "access": "public"
   },
   "dependencies": {
     "child-process-promise": "^2.2.1",
-    "inquirer": "^3.0.6",
     "fs-extra": "^3.0.1",
+    "inquirer": "^3.0.6",
     "yargs": "^8.0.1"
   },
   "devDependencies": {
-    "@defualt/dev_env": "^0.0.1"
+    "@defualt/dev_env": "^0.0.2"
   }
 }

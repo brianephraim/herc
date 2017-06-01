@@ -63,7 +63,7 @@ function updateRemoteRepos(reposNeedingCommits) {
           # COPY SOME FILES FROM THE MONOREPO ROOT INTO THE RECENTLY CLONED NON-MONO REPO FOLDER
           cp ./.gitignore ${tempRepo}/.gitignore;
           cp ./.eslintrc ${tempRepo}/.eslintrc;
-          cp ./.babelrc ${tempRepo}/.babelr;
+          cp ./.babelrc ${tempRepo}/.babelrc;
 
           # MOVE THE PRESERVED .git FOLDER BACK INTO THE RECENTLY CLONED REPO FOLDER
           mv ./tempRepos/.git ${tempRepo}/.git;
