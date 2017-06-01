@@ -4,57 +4,7 @@ const fs = require('fs-extra');
 
 const exec = require('child-process-promise').exec;
 
-const inquirer = require('inquirer');
-
-inquirer.prompt([
-  {
-    type: 'input',
-    name: 'phone',
-    message: 'NAME your package/repo',
-    default: function () {
-      return 'Doe';
-    },
-    validate: function (value) {
-      if (value) {
-        return true;
-      }
-
-      return 'NAME your package/repo';
-    }
-  }
-]).then(function (answers) {
-    // Use user feedback for... whatever!! 
-    console.log('AND THE ANSERS ARE');
-    console.log('answers', answers);
-}).catch((r) => {
-  console.log('caught',r);
-});
-// const a = fs.readJsonSync('./asdfasdf.json');
-// console.log('AAAAA',a)
-
-function initPackageDotJson(repoName) {
-  let packageDotJsonContents;
-  exec(`curl https://registry.npmjs.org/@defualt%2F${repoName}/`).then(({error, stdout}) => {
-    const repoAvailable = JSON.parse(stdout).error === 'Not Found';
-    console.log('error', error);
-    console.log('gggg',repoAvailable);
-    console.log('stdout', JSON.parse(stdout));
-    console.log('stdout', typeof stdout);
-  });
-  exec(`curl https://github.com/defualt/${repoName}/`).then(({error, stdout}) => {
-    const repoAvailable = stdout === 'Not Found';
-  });
-  // Promise.all
-  try {
-    
-  } catch (e) {
-    console.log('eee',e);
-  }
-
-  // throw 'asdf';
-
-}
-initPackageDotJson('hercx');
+const generatePackageDotJsonContent = require('./generatePackageDotJsonContent');
 
 function createRepo(repoName, token) {
   return exec(`curl -H "Authorization: token ${token}" https://api.github.com/user/repos -d '{"name":"${repoName}"}'`)
@@ -67,26 +17,16 @@ function createRepo(repoName, token) {
       return Promise.reject(new Error(stdout));
     }
     const packageDotJsonPath = `./packages/${repoName}/package.json`;
-    const packageDotJsonContents = fs.readJsonSync(packageDotJsonPath);
-    const devEnvVersion = fs.readJsonSync('./packages/dev_env/package.json').version;
-    Object.assign(packageDotJsonContents, {
-      repository: {
-        type: 'git',
-        url: response.clone_url,
-      },
-      version: packageDotJsonContents.version || '0.0.1',
-      publishConfig: {
-        access: 'public',
-      },
-      devDependencies: Object.assign(
-        (repoName !== 'dev_env' ? { '@defualt/dev_env': `^${devEnvVersion}` } : {}),
-        packageDotJsonContents.devDependencies
-      ),
+
+    const packageDotJsonContents = generatePackageDotJsonContent({
+      toExtend: fs.readJsonSync(packageDotJsonPath),
+      repoName,
     });
+
     fs.writeJsonSync(packageDotJsonPath, packageDotJsonContents, { spaces: 2 });
     return {
       packageFolderName: repoName,
-      repoUrl: response.clone_url,
+      url: response.clone_url,
     };
   });
 }
