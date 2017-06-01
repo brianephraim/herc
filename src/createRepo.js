@@ -29,7 +29,7 @@ function createRepo(repoName, token) {
     fs.writeJsonSync(packageDotJsonPath, packageDotJsonContents, { spaces: 2 });
     return {
       packageFolderName: repoName,
-      url: response.clone_url,
+      repoUrl: response.clone_url,
     };
   });
 }
