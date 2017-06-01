@@ -39,8 +39,7 @@ function updateRemoteRepos(reposNeedingCommits) {
         return response;
       })
       .then((createRepoResponse) => {
-        console.log('reposNeedingCommits',reposNeedingCommits, j);
-        console.log('createRepoResponse',createRepoResponse);
+        // console.log(reposNeedingCommits)
         const repoUrl = reposNeedingCommits[j].repoUrl || createRepoResponse.repoUrl;
         const tempRepo = `./tempRepos/${packageFolderName}`;
         const gitRepo = `git -C ${tempRepo}`;
@@ -81,7 +80,7 @@ function updateRemoteRepos(reposNeedingCommits) {
           fi
 
           # ALL DONE WITH RECENTLY CLONED REPO, DELETE IT
-          rm -rf ${tempRepo};
+          # rm -rf ${tempRepo};
         `);
       })
       /*
