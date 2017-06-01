@@ -86,6 +86,7 @@ function updateRemoteRepos(reposNeedingCommits) {
       /*
       */
       .then(({stdout}) => {
+        console.log(stdout)
         console.info(`Done processing ${packageFolderName}.`);
         return recurse();
       });
