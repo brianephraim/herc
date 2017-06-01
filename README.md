@@ -1,13 +1,29 @@
-experimental - use with extreme caution
+experimental - do not use
 
-herc, as in Hercules, slayed the Lerna Hydra by chopping off its various heads.
+In the course of developing an application, you author a number of modules that each encapsulate some functionality that could be useful in other contexts.  You want to publish these modules as independent packages on NPM.
 
-[lerna] is a package that pubishes various folders into various npm packages.  This is a monorepo.  It takes its name from the Lerna Hydra because each of these folders could be considered a head, and they are unified on the same body (the repo).
+To publish such a a module to NPM, you could add an appropriate package.json file to the module's sub directory within your applition's source, and `npm publish` from there.  If you had multiple modules that published to NPM like this, they might use one another as dependencies, and keeping package version information up to date amongst the packages would be tedious.  You update package-A to version 2, package-B depends on package-A so you need to bump package-A dependecy version in package-B.  And package-C might depend on package-B and so on.
 
-herc will publish those folders to their own Github repos individually.  It will create a Github project for each folder if one doesn't exist, or it will commit changes to a Github repo project with the name of that folder.  This doesn't remove code from the monorepo.
+Lerna is software that solves this versioning complexity.
 
-Why use herc?
+With a Lerna setup, we can be productive deveolping our application and publishing application modules as packages as a side effect.  But we are missing something.  How do we get feedback on our NPM packages?  
 
-You have modules that depend on one another.  The modules could have utility to other programmers, so you want to publish them to npm for the community.  You decide a monorepo via lerna is a good approach to manage the various modules' inter-dependencies, package versioning and npm publishing.  But how will the community communicate issues/bugs for these packages, or submit pull requests?  Without herc, they would do this through your monorepo's github project.  But your monorepo is sprawling with various projects.  It's not like you have a monorepo because you're writing the next babel with a slew of plugins focused on that one project.  It would be confusing for you and the rest of the community to do all the Githubbing for all your code in the same monorepo project.  You also might not want to have your sprawling monorepo to be public because it has client code.  So you use herc to publish from your monorepo to various Github projects.
+Typically, an NPM package has Github repositiory associated dedicated to it.  Some popular projects, such as Babel, use Lerna successfully.  The Babel Github project stores the source for various individually installable NPM packages.  If you find a bug, you can report it to the Babel monorepo Github project.  It's a Babel-focused mono-repo.
 
-Write all your code in the monorepo.  Run `lerna publish` to publish to npm.  Run `node_modules/.bin/herc` to publish to Github.  If you accept a pull request on one of those projects ... I need to write a script to re-import.
+Contrast the Babel use case with our application use case.  Our application is not a library like Babel.  The packages we publish are a side-effect of our application development.  Many packages might not have anything to do with eachother other than happening to be used in the same application.  The application's issue reports should be focused on business logic and UI bugs, not some minutia about NPM package APIs.  It's likely that our application's Github repository isn't even public.  Then there would be no way for the broader developer community to report bugs on our NPM packages or submit pull requests.
+
+So let's consider another way to publish NPM packages while developing an application that affords us individual repositories for each NPM pacakge.
+
+For the module you wanted to publish to NPM, you would move its code out of the application's source, and into a new Github repository.  From there, you would configure it for publishing to NPM and run npm publish.  Then from the application, I would re-integrate my module via `npm install mymodule`.  
+
+Now developers can integrate my module into their projects via `npm install` also.  And the module has its own Github repo project developers for submit pull requests and issue reports.  Great!
+
+But there is a substantial drawback.  If I modify my module, in order for that change to affect my application, I need to `npm publish` from the module directory, and then I need to `npm update` from my application repo.  If I need to change branches or rollback in my application repo, I would need to `npm install` to be sure my published module is on the correct version for that commit.  When I have multiple packages that use eachother as dependencies, versioning would be nightmare.  
+
+This workflow is substantially worse than the Lerna workflow, but at least we have individual public Github projects for each package, so the community can submit issues and pull requests.
+
+How do we get the best of both worlds? We want the turn-key multi-package versioning of Lerna, but want each package to have its own repository.
+
+Enter Herc.
+
+With Herc, you write your application as you would with Lerna.  Publish to NPM with Lerna.  Commit your source as a monorepo.  Then you publish your various packages from within your monorepo to individual Github repos.  Essential, for each package's folder, Herc clones a an associated Github repo, deletes the repos contents at its head, copies over the contents of the package's folder, git commits and pushes.

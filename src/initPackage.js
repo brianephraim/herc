@@ -63,7 +63,7 @@ function validate(answers) {
   }));
   if (!isPrivate) {
     validations.push(
-      exec(`curl https://registry.npmjs.org/${semiEncodedNameWithScope}/`).then(({ error, stdout }) => {
+      exec(`curl https://registry.npmjs.org/${semiEncodedNameWithScope}/`).then(({ stdout }) => {
         const npmAvailable = !JSON.parse(stdout).name;
         console.info(npmAvailable ? makeMsg('Good', 'NPM', nameWithScope) : makeMsg('Bad', 'NPM', nameWithScope));
         if (!npmAvailable) {
@@ -71,13 +71,13 @@ function validate(answers) {
         }
         return npmAvailable;
       }),
-      exec(`curl -s -o /dev/null -w "%{http_code}" https://github.com/defualt/${repoName}/`).then(({error, stdout}) => {
+      exec(`curl -s -o /dev/null -w "%{http_code}" https://github.com/defualt/${repoName}/`).then(({ stdout }) => {
         const repoAvailable = stdout !== '200';
-        console.info(repoAvailable ? makeMsg('Good', 'Github', repoName) : makeMsg('Bad', 'Github', repoName));  
+        console.info(repoAvailable ? makeMsg('Good', 'Github', repoName) : makeMsg('Bad', 'Github', repoName));
         if (!repoAvailable) {
           return Promise.reject(new Error(`Github project already exists: ${repoName}`));
         }
-        return repoAvailable;  
+        return repoAvailable;
       })
     );
   }
@@ -89,7 +89,7 @@ function validate(answers) {
       nameWithScope,
       repoName,
       folderPath,
-    }
+    };
   });
 }
 
@@ -108,6 +108,9 @@ function boilerplateFolder(details) {
 
   const testFileContent = `// import ${details.repoName} from ./${details.repoName};\n// const ${details.repoName} = require('./${details.repoName}');\n`;
   fs.writeFileSync(`${details.folderPath}${details.repoName}.test.js`, testFileContent);
+
+  const readmeFileContent = `experimental - use with caution  \nrepoName: ${details.repoName}  \nnpm name: ${details.nameWithScope}  \n`;
+  fs.writeFileSync('README.md', readmeFileContent);
 }
 
 
