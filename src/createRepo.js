@@ -21,6 +21,7 @@ function createRepo(repoName, token) {
     const packageDotJsonContents = generatePackageDotJsonContent({
       toExtend: fs.readJsonSync(packageDotJsonPath),
       repoName,
+      url: response.clone_url,
     });
 
     fs.writeJsonSync(packageDotJsonPath, packageDotJsonContents, { spaces: 2 });
