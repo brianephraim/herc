@@ -24,6 +24,8 @@ function createRepo(repoName, token) {
       url: response.clone_url,
     });
 
+    console.log('packageDotJsonContents',packageDotJsonContents);
+
     fs.writeJsonSync(packageDotJsonPath, packageDotJsonContents, { spaces: 2 });
     return {
       packageFolderName: repoName,
