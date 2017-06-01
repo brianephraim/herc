@@ -41,6 +41,7 @@ function updateRemoteRepos(reposNeedingCommits) {
       .then((createRepoResponse) => {
         // console.log(reposNeedingCommits)
         const repoUrl = reposNeedingCommits[j].repoUrl || createRepoResponse.repoUrl;
+        console.log(repoUrl);
         const tempRepo = `./tempRepos/${packageFolderName}`;
         const gitRepo = `git -C ${tempRepo}`;
         return exec(`
