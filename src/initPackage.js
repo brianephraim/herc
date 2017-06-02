@@ -103,10 +103,22 @@ function boilerplateFolder(details) {
   });
   fs.writeJsonSync(`${details.folderPath}package.json`, packageDotJsonContent, { spaces: 2 });
 
-  const jsFileContent = `// repo name: ${details.repoName}\n// npm name: ${details.nameWithScope}\n`;
+const jsFileContent = `// repo name: ${details.repoName}
+// npm name: ${details.nameWithScope}
+console.log('hey there from ${details.repoName} -- ${details.nameWithScope}');
+export default '${details.repoName} -- ${details.nameWithScope}';
+`;
+
   fs.writeFileSync(`${details.folderPath}${details.repoName}.js`, jsFileContent);
 
-  const testFileContent = `// import ${details.repoName} from ./${details.repoName};\n// const ${details.repoName} = require('./${details.repoName}');\n`;
+
+const testFileContent = `// import ${details.repoName} from ./${details.repoName};
+// const ${details.repoName} = require('./${details.repoName}');
+test('adds 1 + 2 to equal 3', () => {
+  expect(1 + 2).toBe(3);
+});
+`;
+
   fs.writeFileSync(`${details.folderPath}${details.repoName}.test.js`, testFileContent);
 
   const readmeFileContent = `experimental - use with caution  \nrepoName: ${details.repoName}  \nnpm name: ${details.nameWithScope}  \n`;
