@@ -4,6 +4,17 @@ const exec = require('child-process-promise').exec;
 const fs = require('fs-extra');
 const generatePackageDotJsonContent = require('./generatePackageDotJsonContent');
 
+function makeJsFile (repoName, folderPath, flavor, extra = () => { return ''; }) {
+  const filename = `${repoName}${flavor ? '.' + flavor : ''}.js`;
+  const fileContent = `/* eslint-disable no-console */
+import ${repoName} from './${repoName}';
+console.log('logging from ${filename}', ${repoName});
+${extra({ repoName, flavor, filename})}
+`;
+
+  fs.writeFileSync(`${folderPath}${filename}`, fileContent);
+}
+
 function survey() {
   return inquirer.prompt([
     {
@@ -103,23 +114,27 @@ function boilerplateFolder(details) {
   });
   fs.writeJsonSync(`${details.folderPath}package.json`, packageDotJsonContent, { spaces: 2 });
 
-const jsFileContent = `// repo name: ${details.repoName}
+
+
+  makeJsFile(details.repoName, details.folderPath, null, ({repoName, flavor, filename}) => {
+    return `// repo name: ${repoName}
 // npm name: ${details.nameWithScope}
-console.log('hey there from ${details.repoName} -- ${details.nameWithScope}');
-export default '${details.repoName} -- ${details.nameWithScope}';
-`;
 
-  fs.writeFileSync(`${details.folderPath}${details.repoName}.js`, jsFileContent);
+console.log('hey there from ${repoName} -- ${details.nameWithScope}');
+export default '${repoName} -- ${details.nameWithScope}';`
+  });
 
 
-const testFileContent = `// import ${details.repoName} from ./${details.repoName};
-// const ${details.repoName} = require('./${details.repoName}');
-test('adds 1 + 2 to equal 3', () => {
+  makeJsFile(details.repoName, details.folderPath, 'test', ({repoName, flavor, filename}) => {
+    return `test('adds 1 + 2 to equal 3', () => {
   expect(1 + 2).toBe(3);
-});
-`;
+});`
+  });
 
-  fs.writeFileSync(`${details.folderPath}${details.repoName}.test.js`, testFileContent);
+
+  makeJsFile(details.repoName, details.folderPath, 'demo', ({repoName, flavor, filename}) => {
+    return `console.log('logging data retrieved from "./${repoName}" as ${repoName} within  "${filename}" .  The value is "' + ${repoName} + '" .');`
+  });
 
   const readmeFileContent = `experimental - use with caution  \nrepoName: ${details.repoName}  \nnpm name: ${details.nameWithScope}  \n`;
   fs.writeFileSync(`${details.folderPath}README.md`, readmeFileContent);
