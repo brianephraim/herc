@@ -4,7 +4,7 @@ function filterOutNonRepos(packageFolderNames) {
   return packageFolderNames.reduce((repos, packageFolderName) => {
     try {
       const packageDotJsonContents = fs.readJsonSync(`./packages/${packageFolderName}/package.json`);
-      if (packageDotJsonContents && !packageDotJsonContents.private) {
+      if (packageDotJsonContents && !packageDotJsonContents.privateFromGithub) {
         const repoUrl = (
           packageDotJsonContents.repository && packageDotJsonContents.repository.url
         ) ? packageDotJsonContents.repository.url : null;

@@ -37,6 +37,13 @@ function generatePackageDotJsonContent(settings) {
     private: true
   };
 
+  const publishConfigOrPrivateGithub = !settings.isPrivateFromGithub ? {} : {
+    privateFromGithub: true
+  };
+
+  console.log('publishConfigOrPrivateGithub',publishConfigOrPrivateGithub);
+  console.log(settings);
+
   const scripts = {
     scripts: Object.assign(
       {
@@ -51,7 +58,7 @@ function generatePackageDotJsonContent(settings) {
   const version = {
     version: toExtend.version || '0.0.1'
   };
-  return Object.assign(toExtend, name, version, repository, publishConfigOrPrivate, scripts, devDependencies);
+  return Object.assign(toExtend, name, version, repository, publishConfigOrPrivate, publishConfigOrPrivateGithub, scripts, devDependencies);
 }
 
 module.exports = generatePackageDotJsonContent;

@@ -6,7 +6,7 @@ function determineReposStatuses(packagesWithChanges) {
   const reposStatuses = packagesWithChanges.reduce((statuses, packageFolderName) => {
     try {
       const packageDotJsonContents = fs.readJsonSync(`./packages/${packageFolderName}/package.json`);
-      if (!packageDotJsonContents || packageDotJsonContents.private) {
+      if (!packageDotJsonContents || packageDotJsonContents.privateFromGithub) {
         statuses.private.push({
           packageFolderName,
         });

@@ -44,8 +44,16 @@ function survey() {
     },
     {
       type: 'input',
-      name: 'private',
-      message: 'Make it private? (Will not publish to NPM or Github).  (default "no")',
+      name: 'privateNpm',
+      message: 'Make it private from NPM? (Will not publish to NPM).  (default "no")',
+      default: () => {
+        return 'no';
+      },
+    },
+    {
+      type: 'input',
+      name: 'privateGithub',
+      message: 'Make it private from Github? (Will not publish to Github).  (default "no")',
       default: () => {
         return 'no';
       },
@@ -59,7 +67,8 @@ function validate(answers) {
     return `${exclamation}!, ${destination}, ${name} is ${(exclamation === 'Bad' ? 'NOT ' : '')}available!`;
   };
   const useScope = answers.npmScope[0].toLowerCase() === 'y';
-  const isPrivate = answers.private[0].toLowerCase() === 'y';
+  const isPrivateNpm = answers.privateNpm[0].toLowerCase() === 'y';
+  const isPrivateGithub = answers.privateGithub[0].toLowerCase() === 'y';
   const nameWithScope = useScope ? `@${process.env.NPM_SCOPE}/${repoName}` : repoName;
   const semiEncodedNameWithScope = useScope ? `@${process.env.NPM_SCOPE}${encodeURIComponent('/')}${repoName}` : repoName;
   const folderPath = `${process.cwd()}/packages/${repoName}/`;
@@ -72,7 +81,7 @@ function validate(answers) {
     }
     return folderAvailable;
   }));
-  if (!isPrivate) {
+  if (!isPrivateNpm) {
     validations.push(
       exec(`curl https://registry.npmjs.org/${semiEncodedNameWithScope}/`).then(({ stdout }) => {
         const npmAvailable = !JSON.parse(stdout).name;
@@ -81,7 +90,11 @@ function validate(answers) {
           return Promise.reject(new Error(`NPM already exists: ${nameWithScope}`));
         }
         return npmAvailable;
-      }),
+      })
+    );
+  }
+  if (!isPrivateGithub) {
+    validations.push(
       exec(`curl -s -o /dev/null -w "%{http_code}" https://github.com/${process.env.NPM_SCOPE}/${repoName}/`).then(({ stdout }) => {
         const repoAvailable = stdout !== '200';
         console.info(repoAvailable ? makeMsg('Good', 'Github', repoName) : makeMsg('Bad', 'Github', repoName));
@@ -96,7 +109,8 @@ function validate(answers) {
     console.log('ALLL GOOOOD');
     return {
       useScope,
-      isPrivate,
+      isPrivateNpm,
+      isPrivateGithub,
       nameWithScope,
       repoName,
       folderPath,
@@ -110,7 +124,8 @@ function boilerplateFolder(details) {
 
   const packageDotJsonContent = generatePackageDotJsonContent({
     name: details.nameWithScope,
-    isPrivate: details.isPrivate,
+    isPrivate: details.isPrivateNpm,
+    isPrivateFromGithub: details.isPrivateGithub,
   });
   fs.writeJsonSync(`${details.folderPath}package.json`, packageDotJsonContent, { spaces: 2 });
 
