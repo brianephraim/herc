@@ -1,5 +1,6 @@
 const path = require('path');
 const fs = require('fs-extra');
+
 function generatePackageDotJsonContent(settings) {
   const toExtend = settings.toExtend || {};
   const scopedPackageName = '@defualt/dev_env';
@@ -22,6 +23,11 @@ function generatePackageDotJsonContent(settings) {
   const name = settings.name ? {
     name: settings.name,
   } : {};
+
+  const bundleForNode = settings.bundleForNode ? {
+    bundleForNode: settings.bundleForNode,
+  } : {};
+
   /*
     useScope,
     isPrivate,
@@ -58,7 +64,7 @@ function generatePackageDotJsonContent(settings) {
   const version = {
     version: toExtend.version || '0.0.1'
   };
-  return Object.assign(toExtend, name, version, repository, publishConfigOrPrivate, publishConfigOrPrivateGithub, scripts, devDependencies);
+  return Object.assign(toExtend, name, version, repository, publishConfigOrPrivate, publishConfigOrPrivateGithub, bundleForNode, scripts, devDependencies);
 }
 
 module.exports = generatePackageDotJsonContent;

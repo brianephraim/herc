@@ -24,6 +24,6 @@ This workflow is substantially worse than the Lerna workflow, but at least we ha
 
 How do we get the best of both worlds? We want the turn-key multi-package versioning of Lerna, but want each package to have its own repository.
 
-Enter Herc.
+Enter mono-to-multirepo.
 
-With Herc, you write your application as you would with Lerna.  Publish to NPM with Lerna.  Commit your source as a monorepo.  Then you publish your various packages from within your monorepo to individual Github repos.  Essential, for each package's folder, Herc clones a an associated Github repo, deletes the repos contents at its head, copies over the contents of the package's folder, git commits and pushes.
+With mono-to-multirepo, you write your application as you would with Lerna.  Publish to NPM with Lerna.  Commit your source as a monorepo.  Then you publish your various packages from within your monorepo to individual Github repos.  Essential, for each package's folder, mono-to-multirepo clones a an associated Github repo, deletes the repos contents at its head, copies over the contents of the package's folder, git commits and pushes.

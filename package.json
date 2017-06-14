@@ -9,6 +9,7 @@
     "access": "public"
   },
   "dependencies": {
+    "case": "^1.5.2",
     "child-process-promise": "^2.2.1",
     "fs-extra": "^3.0.1",
     "inquirer": "^3.0.6",
